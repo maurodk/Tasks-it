@@ -1,0 +1,5 @@
+# Configurações do Supabase para o ambiente local
+
+[auth]
+# Desabilita a necessidade de confirmar o e-mail para novos usuários.
+email.enable_confirmations = false

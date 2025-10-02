@@ -1,14 +1,14 @@
-# 🚀 Week Flow Hub - Sistema de Gestão de Atividades
+# 🏗️ VCA TASKS - Sistema de Gestão de Atividades
 
 <div align="center">
 
-![Week Flow Hub](https://img.shields.io/badge/Week_Flow_Hub-09b230?style=for-the-badge&logo=check-circle&logoColor=white)
+![VCA TASKS](https://img.shields.io/badge/VCA-TASKS-09b230?style=for-the-badge&logo=building&logoColor=white)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-**Sistema moderno de gestão de atividades semanais com calendário interativo e colaboração em equipe.**
+**Sistema moderno de gestão de atividades semanais com calendário interativo e colaboração em equipe para a VCA Construtora**
 
 [🚀 Demo](#demo) • [📖 Documentação](#documentação) • [🛠️ Instalação](#instalação) • [🎯 Funcionalidades](#funcionalidades)
 
@@ -35,7 +35,7 @@
 
 ## 🎯 Sobre o Projeto
 
-O **Week Flow Hub** é um sistema completo de gestão de atividades. A aplicação permite gerenciamento eficiente de tarefas, acompanhamento de prazos, colaboração em equipe e organização por setores e subsetores.
+O **VCA TASKS** é um sistema completo de gestão de atividades desenvolvido especificamente para a VCA Construtora. A aplicação permite gerenciamento eficiente de tarefas, acompanhamento de prazos, colaboração em equipe e organização por setores e subsetores.
 
 ### 🎨 Interface Moderna
 
@@ -89,7 +89,7 @@ O **Week Flow Hub** é um sistema completo de gestão de atividades. A aplicaç�
 - 🌙 Tema escuro/claro
 - 🖼️ Upload de avatares
 - ⚙️ Configurações personalizáveis
-- 🎨 Design customizável
+- 🏗️ Branding VCA Construtora
 
 ---
 
@@ -129,33 +129,29 @@ O **Week Flow Hub** é um sistema completo de gestão de atividades. A aplicaç�
 
 - Node.js 18+
 - npm ou yarn
+- Conta no Supabase
 - Git
-- [Supabase CLI](https://supabase.com/docs/guides/cli)
 
 ### 🔧 Configuração Local
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/week-flow-hub.git
+git clone https://github.com/maurodk/week-flow-hub.git
 cd week-flow-hub
 
 # 2. Instale as dependências
 npm install
 
-# 3. Inicie o Supabase localmente
-# (Isso iniciará um container Docker com o banco de dados)
-npx supabase start
-
-# 4. Copie as variáveis de ambiente locais
-# O comando acima irá gerar as chaves e URL locais
+# 3. Configure as variáveis de ambiente
 cp .env.example .env.local
 
-# 5. Preencha o .env.local com as chaves fornecidas pelo `supabase start`
+# 4. Configure o Supabase
+# Edite o .env.local com suas credenciais
 
-# 6. Execute as migrações do banco de dados local
-npx supabase db reset
+# 5. Execute as migrações do banco
+npm run supabase:migrate
 
-# 7. Inicie o servidor de desenvolvimento
+# 6. Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
@@ -367,5 +363,3 @@ _Desenvolvido com ❤️ para a VCA Construtora_
 **🔗 [VCA Construtora](https://vcaconstrutora.com.br) | [Documentação Completa](docs/)**
 
 </div>
-#   T a s k s - i t  
- 

@@ -20,14 +20,13 @@ INSERT INTO subsectors (id, name, description, sector_id, created_at, updated_at
   (gen_random_uuid(), 'Estratégico', 'Expansão de negócios e novos mercados', (SELECT id FROM sectors LIMIT 1), NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
--- Adicionar constraint para garantir que apenas os roles válidos sejam usados
+-- Adicionar/Atualizar a constraint para garantir que os roles válidos sejam usados
 DO $$ 
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint 
-        WHERE conname = 'profiles_role_check'
-    ) THEN
-        ALTER TABLE profiles ADD CONSTRAINT profiles_role_check 
-        CHECK (role IN ('collaborator', 'manager'));
-    END IF;
+    -- Remove a constraint antiga se existir, para garantir que a nova seja aplicada.
+    ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
+
+    -- Adiciona a nova constraint com a role 'guest' incluída.
+    ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check
+    CHECK (role IN ('collaborator', 'manager', 'guest'));
 END $$;

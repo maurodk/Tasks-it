@@ -124,7 +124,7 @@ export const LoginForm = () => {
   const handleTestLogin = async () => {
     setLoading(true);
     setError(null);
-    const testEmail = "test@test.com";
+    const testEmail = "test@example.com";
     const testPassword = "password";
 
     try {
@@ -161,7 +161,7 @@ export const LoginForm = () => {
         if (userToApprove) {
           await supabase
             .from("profiles")
-            .update({ is_approved: true, role: "manager" }) // Aprovado como gestor
+            .update({ is_approved: true, role: "guest" }) // Aprovado como GUEST
             .eq("id", userToApprove.id);
         }
 

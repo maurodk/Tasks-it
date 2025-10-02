@@ -96,52 +96,28 @@ UPDATE profiles SET is_approved = true WHERE is_approved IS NULL OR is_approved 
 -- Update handle_new_user function to create pending profiles
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS trigger AS $$
+DECLARE
+    meta jsonb;
 BEGIN
-    -- Check if this is a signup with pending approval flag
-    IF (NEW.raw_user_meta_data->>'is_pending')::boolean = true THEN
-        INSERT INTO public.profiles (
-            id, 
-            email, 
-            full_name, 
-            sector_id,
-            subsector_id,
-            is_approved
-        ) VALUES (
-            NEW.id, 
-            NEW.email, 
-            NEW.raw_user_meta_data->>'full_name',
-            (NEW.raw_user_meta_data->>'sector_id')::uuid,
-            CASE 
-                WHEN NEW.raw_user_meta_data->>'subsector_id' IS NOT NULL 
-                AND NEW.raw_user_meta_data->>'subsector_id' != ''
-                THEN (NEW.raw_user_meta_data->>'subsector_id')::uuid
-                ELSE NULL
-            END,
-            false
-        );
-    ELSE
-        -- Legacy signup (auto-approve)
-        INSERT INTO public.profiles (
-            id, 
-            email, 
-            full_name, 
-            sector_id,
-            subsector_id,
-            is_approved
-        ) VALUES (
-            NEW.id, 
-            NEW.email, 
-            NEW.raw_user_meta_data->>'full_name',
-            (NEW.raw_user_meta_data->>'sector_id')::uuid,
-            CASE 
-                WHEN NEW.raw_user_meta_data->>'subsector_id' IS NOT NULL 
-                AND NEW.raw_user_meta_data->>'subsector_id' != ''
-                THEN (NEW.raw_user_meta_data->>'subsector_id')::uuid
-                ELSE NULL
-            END,
-            true
-        );
-    END IF;
+    meta := NEW.raw_user_meta_data;
+
+    INSERT INTO public.profiles (
+        id, 
+        email, 
+        full_name, 
+        sector_id,
+        subsector_id,
+        is_approved,
+        role
+    ) VALUES (
+        NEW.id, 
+        NEW.email, 
+        COALESCE(meta->>'full_name', ''),
+        (meta->>'sector_id')::uuid,
+        (meta->>'subsector_id')::uuid,
+        COALESCE((meta->>'is_pending')::boolean, false) = false, -- Se is_pending for true, is_approved é false.
+        'collaborator' -- Role padrão, será sobrescrita para 'guest' no frontend se for o caso.
+    );
     
     RETURN NEW;
 END;

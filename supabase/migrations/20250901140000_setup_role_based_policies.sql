@@ -13,21 +13,21 @@ CREATE POLICY "Role-based activity viewing" ON activities
 FOR SELECT TO authenticated
 USING (
   CASE 
-    WHEN (
-      SELECT role FROM profiles 
-      WHERE id = auth.uid()
-    ) = 'manager' THEN
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
       -- Gestores podem ver todas as atividades do setor
       sector_id = (
         SELECT sector_id FROM profiles 
         WHERE id = auth.uid()
       )
-    ELSE
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'collaborator' THEN
       -- Colaboradores podem ver apenas atividades do seu subsetor
       subsector_id = (
         SELECT subsector_id FROM profiles 
         WHERE id = auth.uid()
       )
+    ELSE
+      -- Guests e outros veem apenas suas próprias atividades
+      user_id = auth.uid()
   END
 );
 
@@ -35,18 +35,13 @@ USING (
 CREATE POLICY "Role-based activity creation" ON activities
 FOR INSERT TO authenticated
 WITH CHECK (
-  -- Verificar se o usuário está no mesmo setor
-  sector_id = (
-    SELECT sector_id FROM profiles 
-    WHERE id = auth.uid()
-  )
-  AND
-  CASE 
-    WHEN (
-      SELECT role FROM profiles 
-      WHERE id = auth.uid()
-    ) = 'manager' THEN
+  CASE
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'guest' THEN
+      -- Guests podem criar atividades para si mesmos (sem setor ou subsetor)
+      created_by = auth.uid() AND sector_id IS NULL AND subsector_id IS NULL
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
       -- Gestores podem criar atividades em qualquer subsetor do setor
+      sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid()) AND
       subsector_id IN (
         SELECT id FROM subsectors 
         WHERE sector_id = (
@@ -54,12 +49,10 @@ WITH CHECK (
           WHERE id = auth.uid()
         )
       )
-    ELSE
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'collaborator' THEN
       -- Colaboradores podem criar apenas no seu subsetor
-      subsector_id = (
-        SELECT subsector_id FROM profiles 
-        WHERE id = auth.uid()
-      )
+      sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid()) AND
+      subsector_id = (SELECT subsector_id FROM profiles WHERE id = auth.uid())
   END
 );
 
@@ -68,21 +61,20 @@ CREATE POLICY "Role-based activity updating" ON activities
 FOR UPDATE TO authenticated
 USING (
   CASE 
-    WHEN (
-      SELECT role FROM profiles 
-      WHERE id = auth.uid()
-    ) = 'manager' THEN
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
       -- Gestores podem atualizar atividades do setor
       sector_id = (
         SELECT sector_id FROM profiles 
         WHERE id = auth.uid()
       )
-    ELSE
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'collaborator' THEN
       -- Colaboradores podem atualizar apenas atividades do seu subsetor
       subsector_id = (
-        SELECT subsector_id FROM profiles 
-        WHERE id = auth.uid()
+        SELECT subsector_id FROM profiles WHERE id = auth.uid()
       )
+    ELSE
+      -- Guests podem atualizar apenas suas próprias atividades
+      user_id = auth.uid()
   END
 );
 
@@ -91,17 +83,11 @@ CREATE POLICY "Role-based activity deletion" ON activities
 FOR DELETE TO authenticated
 USING (
   CASE 
-    WHEN (
-      SELECT role FROM profiles 
-      WHERE id = auth.uid()
-    ) = 'manager' THEN
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
       -- Gestores podem deletar atividades do setor
-      sector_id = (
-        SELECT sector_id FROM profiles 
-        WHERE id = auth.uid()
-      )
+      sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid())
     ELSE
-      -- Colaboradores podem deletar apenas suas próprias atividades
+      -- Colaboradores e Guests podem deletar apenas suas próprias atividades
       user_id = auth.uid()
   END
 );
@@ -119,20 +105,14 @@ USING (
   activity_id IN (
     SELECT id FROM activities 
     WHERE 
-      CASE 
-        WHEN (
-          SELECT role FROM profiles 
-          WHERE id = auth.uid()
-        ) = 'manager' THEN
-          sector_id = (
-            SELECT sector_id FROM profiles 
-            WHERE id = auth.uid()
-          )
+      CASE
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
+          sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid())
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'collaborator' THEN
+          subsector_id = (SELECT subsector_id FROM profiles WHERE id = auth.uid())
         ELSE
-          subsector_id = (
-            SELECT subsector_id FROM profiles 
-            WHERE id = auth.uid()
-          )
+          -- Guests veem subtasks de suas próprias atividades
+          user_id = auth.uid()
       END
   )
 );
@@ -144,20 +124,15 @@ WITH CHECK (
   activity_id IN (
     SELECT id FROM activities 
     WHERE 
-      sector_id = (
-        SELECT sector_id FROM profiles 
-        WHERE id = auth.uid()
-      )
-      AND
-      CASE 
-        WHEN (
-          SELECT role FROM profiles 
-          WHERE id = auth.uid()
-        ) = 'manager' THEN true
+      CASE
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'guest' THEN
+          -- Guests podem criar subtasks em suas próprias atividades
+          created_by = auth.uid()
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN true
         ELSE
+          -- Colaboradores podem criar subtasks em atividades do seu subsetor
           subsector_id = (
-            SELECT subsector_id FROM profiles 
-            WHERE id = auth.uid()
+            SELECT subsector_id FROM profiles WHERE id = auth.uid()
           )
       END
   )
@@ -170,20 +145,14 @@ USING (
   activity_id IN (
     SELECT id FROM activities 
     WHERE 
-      CASE 
-        WHEN (
-          SELECT role FROM profiles 
-          WHERE id = auth.uid()
-        ) = 'manager' THEN
-          sector_id = (
-            SELECT sector_id FROM profiles 
-            WHERE id = auth.uid()
-          )
+      CASE
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
+          sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid())
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'collaborator' THEN
+          subsector_id = (SELECT subsector_id FROM profiles WHERE id = auth.uid())
         ELSE
-          subsector_id = (
-            SELECT subsector_id FROM profiles 
-            WHERE id = auth.uid()
-          )
+          -- Guests atualizam subtasks de suas próprias atividades
+          user_id = auth.uid()
       END
   )
 );
@@ -195,17 +164,11 @@ USING (
   activity_id IN (
     SELECT id FROM activities 
     WHERE 
-      CASE 
-        WHEN (
-          SELECT role FROM profiles 
-          WHERE id = auth.uid()
-        ) = 'manager' THEN
-          sector_id = (
-            SELECT sector_id FROM profiles 
-            WHERE id = auth.uid()
-          )
+      CASE
+        WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
+          sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid())
         ELSE
-          user_id = auth.uid() -- Colaboradores só podem deletar subtasks de suas próprias atividades
+          user_id = auth.uid() -- Colaboradores e Guests só podem deletar subtasks de suas próprias atividades
       END
   )
 );
@@ -216,18 +179,12 @@ DROP POLICY IF EXISTS "Users can view profiles in their sector" ON profiles;
 CREATE POLICY "Role-based profile viewing" ON profiles
 FOR SELECT TO authenticated
 USING (
-  CASE 
-    WHEN (
-      SELECT role FROM profiles 
-      WHERE id = auth.uid()
-    ) = 'manager' THEN
+  CASE
+    WHEN (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager' THEN
       -- Gestores podem ver todos os perfis do setor
-      sector_id = (
-        SELECT sector_id FROM profiles 
-        WHERE id = auth.uid()
-      )
+      sector_id = (SELECT sector_id FROM profiles WHERE id = auth.uid())
     ELSE
-      -- Colaboradores podem ver apenas o próprio perfil
+      -- Colaboradores e Guests podem ver apenas o próprio perfil
       id = auth.uid()
   END
 );

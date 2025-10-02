@@ -24,7 +24,7 @@ export type Database = {
           is_private: boolean;
           list_id: string | null;
           priority: Database["public"]["Enums"]["activity_priority"];
-          sector_id: string;
+          sector_id: string | null;
           status: Database["public"]["Enums"]["activity_status"];
           subsector_id: string | null;
           title: string;
@@ -42,7 +42,7 @@ export type Database = {
           is_private?: boolean;
           list_id?: string | null;
           priority?: Database["public"]["Enums"]["activity_priority"];
-          sector_id: string;
+          sector_id?: string | null;
           status?: Database["public"]["Enums"]["activity_status"];
           subsector_id?: string | null;
           title: string;
@@ -60,7 +60,7 @@ export type Database = {
           is_private?: boolean;
           list_id?: string | null;
           priority?: Database["public"]["Enums"]["activity_priority"];
-          sector_id?: string;
+          sector_id?: string | null;
           status?: Database["public"]["Enums"]["activity_status"];
           subsector_id?: string | null;
           title?: string;
@@ -489,7 +489,7 @@ export type Database = {
         | "updated";
       activity_priority: "low" | "medium" | "high";
       activity_status: "pending" | "in_progress" | "completed" | "archived";
-      user_role: "manager" | "collaborator";
+      user_role: "manager" | "collaborator" | "guest";
     };
     CompositeTypes: {
       [_ in never]: never;

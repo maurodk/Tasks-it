@@ -80,7 +80,7 @@
     "globals": "^15.15.0",
     "lovable-tagger": "^1.1.9",
     "postcss": "^8.5.6",
-    "supabase": "^2.39.2",
+    "supabase": "^2.47.2",
     "tailwind-scrollbar": "^3.0.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",

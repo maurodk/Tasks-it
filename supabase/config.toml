@@ -1,7 +1,1 @@
-# Configurações do Supabase para o ambiente local
-
-[auth]
-# Desabilita a necessidade de confirmar o e-mail para novos usuários.
-email.enable_confirmations = false
-# Desabilita a verificação de força da senha para facilitar o uso de senhas simples em desenvolvimento.
-password.min_strength = 0
+project_id = "btbfkpzydyedzarpsvkm"

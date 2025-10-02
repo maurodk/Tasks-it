@@ -75,17 +75,51 @@ export const SubsectorCards: React.FC<SubsectorCardsProps> = ({
           if (error) throw error;
           setSubsectors(data || []);
         } else if (profile.role === "collaborator") {
-          // Colaboradores veem apenas seu subsetor principal
-          if (profile.subsector_id) {
-            const { data: primarySubsector, error: primaryError } =
-              await supabase
-                .from("subsectors")
-                .select("id, name")
-                .eq("id", profile.subsector_id)
-                .single();
+          // Primeiro, buscar os IDs dos subsetores do usuário
+          const { data: profileSubsectors, error: psError } = await supabase
+            .from("profiles")
+            .select(
+              `
+              id,
+              profile_subsectors!profile_subsectors_profile_id_fkey (
+                subsector_id
+              )
+            `
+            )
+            .eq("id", profile.id)
+            .single();
 
-            if (!primaryError && primarySubsector) {
-              setSubsectors([primarySubsector]);
+          if (!psError && profileSubsectors?.profile_subsectors) {
+            const subsectorIds = profileSubsectors.profile_subsectors
+              .map((ps) => ps.subsector_id)
+              .filter(Boolean);
+
+            // Se tem subsetores associados, buscar seus detalhes
+            if (subsectorIds.length > 0) {
+              const { data: subsectorDetails, error: subsectorError } =
+                await supabase
+                  .from("subsectors")
+                  .select("id, name")
+                  .in("id", subsectorIds);
+
+              if (!subsectorError && subsectorDetails) {
+                setSubsectors(subsectorDetails);
+                return;
+              }
+            }
+
+            // Se não tem múltiplos subsetores ou houve erro, tentar usar o subsetor principal
+            if (profile.subsector_id) {
+              const { data: primarySubsector, error: primaryError } =
+                await supabase
+                  .from("subsectors")
+                  .select("id, name")
+                  .eq("id", profile.subsector_id)
+                  .single();
+
+              if (!primaryError && primarySubsector) {
+                setSubsectors([primarySubsector]);
+              }
             }
           }
         }

@@ -1,4 +1,4 @@
-# 🏗️ TASKS-IT - Sistema de Gestão de Atividades
+# 🏗️ TASKIT - Sistema de Gestão de Atividades
 
 <div align="center">
 
@@ -35,7 +35,7 @@
 
 ## 🎯 Sobre o Projeto
 
-O **TASKS-IT** é um sistema completo de gestão de atividades desenvolvido especificamente para a VCA Construtora. A aplicação permite gerenciamento eficiente de tarefas, acompanhamento de prazos, colaboração em equipe e organização por setores e subsetores.
+O **TASKIT** é um sistema completo de gestão de atividades desenvolvido especificamente para a VCA Construtora. A aplicação permite gerenciamento eficiente de tarefas, acompanhamento de prazos, colaboração em equipe e organização por setores e subsetores.
 
 ### 🎨 Interface Moderna
 
@@ -363,4 +363,3 @@ _Desenvolvido com ❤️ para a VCA Construtora_
 **🔗 [VCA Construtora](https://vcaconstrutora.com.br) | [Documentação Completa](docs/)**
 
 </div>
-

@@ -56,7 +56,7 @@ const Auth = () => {
         <div className="text-center">
           <img
             src={getLogoSrc()}
-            alt="VCA Logo"
+            alt="TASKIT"
             className="h-16 w-auto mx-auto mb-2"
           />
           <p className="text-muted-foreground mt-2">

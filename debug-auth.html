@@ -1,97 +1,127 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Debug Auth - VCA Tasks</title>
+  <head>
+    <title>Debug Auth - TASKIT</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
-        .error { color: red; }
-        .success { color: green; }
-        .warning { color: orange; }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .debug-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ccc;
+      }
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+      .warning {
+        color: orange;
+      }
     </style>
-</head>
-<body>
-    <h1>Debug Auth - VCA Tasks</h1>
-    
+  </head>
+  <body>
+    <h1>Debug Auth - TASKIT</h1>
+
     <div class="debug-section">
-        <h2>1. Variáveis de Ambiente</h2>
-        <div id="env-check"></div>
+      <h2>1. Variáveis de Ambiente</h2>
+      <div id="env-check"></div>
     </div>
-    
+
     <div class="debug-section">
-        <h2>2. Conexão Supabase</h2>
-        <div id="supabase-check"></div>
+      <h2>2. Conexão Supabase</h2>
+      <div id="supabase-check"></div>
     </div>
-    
+
     <div class="debug-section">
-        <h2>3. Estado de Autenticação</h2>
-        <div id="auth-check"></div>
+      <h2>3. Estado de Autenticação</h2>
+      <div id="auth-check"></div>
     </div>
-    
+
     <div class="debug-section">
-        <h2>4. Perfil do Usuário</h2>
-        <div id="profile-check"></div>
+      <h2>4. Perfil do Usuário</h2>
+      <div id="profile-check"></div>
     </div>
 
     <script type="module">
-        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
-        
-        // 1. Check environment variables
-        const envCheck = document.getElementById('env-check');
-        const supabaseUrl = 'https://btbfkpzydyedzarpsvkm.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0YmZrcHp5ZHllZHphcnBzdmttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxNTczMjgsImV4cCI6MjA3MTczMzMyOH0.OhB6rI939uOk8M1RmaDI0e12WFWJXkYPLbGhCo-urrs';
-        
-        if (supabaseUrl && supabaseKey) {
-            envCheck.innerHTML = '<span class="success">✓ Variáveis de ambiente OK</span>';
-        } else {
-            envCheck.innerHTML = '<span class="error">✗ Variáveis de ambiente faltando</span>';
-        }
-        
-        // 2. Check Supabase connection
-        const supabaseCheck = document.getElementById('supabase-check');
-        try {
-            const supabase = createClient(supabaseUrl, supabaseKey);
-            supabaseCheck.innerHTML = '<span class="success">✓ Cliente Supabase criado</span>';
-            
-            // 3. Check auth state
-            const authCheck = document.getElementById('auth-check');
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (error) {
-                authCheck.innerHTML = `<span class="error">✗ Erro na sessão: ${error.message}</span>`;
-            } else if (session) {
-                authCheck.innerHTML = `<span class="success">✓ Usuário logado: ${session.user.email}</span>`;
-                
-                // 4. Check profile
-                const profileCheck = document.getElementById('profile-check');
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single();
-                
-                if (profileError) {
-                    profileCheck.innerHTML = `<span class="error">✗ Erro no perfil: ${profileError.message}</span>`;
-                } else if (profile) {
-                    profileCheck.innerHTML = `
+      import { createClient } from "https://cdn.skypack.dev/@supabase/supabase-js";
+
+      // 1. Check environment variables
+      const envCheck = document.getElementById("env-check");
+      const supabaseUrl = "https://btbfkpzydyedzarpsvkm.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0YmZrcHp5ZHllZHphcnBzdmttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxNTczMjgsImV4cCI6MjA3MTczMzMyOH0.OhB6rI939uOk8M1RmaDI0e12WFWJXkYPLbGhCo-urrs";
+
+      if (supabaseUrl && supabaseKey) {
+        envCheck.innerHTML =
+          '<span class="success">✓ Variáveis de ambiente OK</span>';
+      } else {
+        envCheck.innerHTML =
+          '<span class="error">✗ Variáveis de ambiente faltando</span>';
+      }
+
+      // 2. Check Supabase connection
+      const supabaseCheck = document.getElementById("supabase-check");
+      try {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        supabaseCheck.innerHTML =
+          '<span class="success">✓ Cliente Supabase criado</span>';
+
+        // 3. Check auth state
+        const authCheck = document.getElementById("auth-check");
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          authCheck.innerHTML = `<span class="error">✗ Erro na sessão: ${error.message}</span>`;
+        } else if (session) {
+          authCheck.innerHTML = `<span class="success">✓ Usuário logado: ${session.user.email}</span>`;
+
+          // 4. Check profile
+          const profileCheck = document.getElementById("profile-check");
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          if (profileError) {
+            profileCheck.innerHTML = `<span class="error">✗ Erro no perfil: ${profileError.message}</span>`;
+          } else if (profile) {
+            profileCheck.innerHTML = `
                         <span class="success">✓ Perfil encontrado</span><br>
-                        <strong>Nome:</strong> ${profile.full_name || 'N/A'}<br>
+                        <strong>Nome:</strong> ${profile.full_name || "N/A"}<br>
                         <strong>Email:</strong> ${profile.email}<br>
                         <strong>Role:</strong> ${profile.role}<br>
-                        <strong>Setor ID:</strong> ${profile.sector_id || '<span class="error">FALTANDO!</span>'}<br>
-                        <strong>Subsetor ID:</strong> ${profile.subsector_id || 'N/A'}<br>
-                        <strong>Aprovado:</strong> ${profile.is_approved !== false ? 'Sim' : '<span class="error">NÃO</span>'}
+                        <strong>Setor ID:</strong> ${
+                          profile.sector_id ||
+                          '<span class="error">FALTANDO!</span>'
+                        }<br>
+                        <strong>Subsetor ID:</strong> ${
+                          profile.subsector_id || "N/A"
+                        }<br>
+                        <strong>Aprovado:</strong> ${
+                          profile.is_approved !== false
+                            ? "Sim"
+                            : '<span class="error">NÃO</span>'
+                        }
                     `;
-                } else {
-                    profileCheck.innerHTML = '<span class="error">✗ Perfil não encontrado</span>';
-                }
-            } else {
-                authCheck.innerHTML = '<span class="warning">⚠ Nenhuma sessão ativa</span>';
-            }
-            
-        } catch (error) {
-            supabaseCheck.innerHTML = `<span class="error">✗ Erro ao conectar: ${error.message}</span>`;
+          } else {
+            profileCheck.innerHTML =
+              '<span class="error">✗ Perfil não encontrado</span>';
+          }
+        } else {
+          authCheck.innerHTML =
+            '<span class="warning">⚠ Nenhuma sessão ativa</span>';
         }
+      } catch (error) {
+        supabaseCheck.innerHTML = `<span class="error">✗ Erro ao conectar: ${error.message}</span>`;
+      }
     </script>
-</body>
+  </body>
 </html>

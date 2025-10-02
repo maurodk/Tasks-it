@@ -436,7 +436,7 @@ export const RegisterForm = () => {
       </Button>
 
       <p className="text-sm text-muted-foreground text-center">
-        Registre-se para começar a usar o VCA TASKS.
+        Registre-se para começar a usar o TASKIT.
       </p>
     </form>
   );
